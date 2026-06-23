@@ -17,9 +17,9 @@ ul,ol,li{list-style:none;}
   --bio:#6a9448;--bio-d:#3a5428;--bio-p:#8ab860;
   --cream:#c0aa80;--cream-d:#8a7a60;--cream-m:#4a4030;
   /* A11y: minimum contrast ratios met against --bg */
-  --text-primary:#d4c4a0;   /* 5.2:1 on --bg */
-  --text-secondary:#a09070; /* 4.6:1 on --bg */
-  --text-muted:#706050;     /* 3.1:1 — used only for decorative text */
+  --text-primary:#e0d0a8;   /* 6.5:1 on --bg — brighter cream */
+  --text-secondary:#b8a07a; /* 5.1:1 on --bg */
+  --text-muted:#806848;     /* 3.2:1 — decorative only */
   --focus:#8ab860;          /* focus ring color */
 }
 
@@ -39,7 +39,7 @@ body{
   font-family:'Share Tech Mono',monospace;
   overflow-x:hidden;
   /* A11y: minimum 16px base reading size */
-  font-size:17px;
+  font-size:18px;
   line-height:1.6;
 }
 
@@ -235,10 +235,21 @@ nav{
 }
 .btns:hover{background:rgba(40,60,80,0.15);border-color:rgba(72,96,112,0.65);}
 
+/* scroll hint — absolute al hero, centrado abajo */
 .scroll-hint{
-  position:relative;z-index:3;display:flex;flex-direction:column;
-  align-items:flex-start;gap:.5rem;margin-top:3.5rem;
-  opacity:0;animation:fadeUp .8s ease 1.3s forwards;
+  position:absolute;
+  bottom:2rem;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:3;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:.5rem;
+  opacity:0;
+  animation:fadeUp .8s ease 1.3s forwards;
+  pointer-events:none;
+  white-space:nowrap;
 }
 .scroll-hint span{font-size:.4375rem;letter-spacing:5px;color:var(--text-muted);text-transform:uppercase;}
 .scroll-arrow{width:1px;height:28px;background:linear-gradient(to bottom,rgba(200,120,32,0.5),transparent);
@@ -539,7 +550,7 @@ footer{
       <div class="nav-logo" aria-hidden="true">J · LISTELLO</div>
       <ul class="nav-links" role="list">
         <li><a href="#showreel">Showreel</a></li>
-        <li><a href="#works">Works</a></li>
+        <li><a href="#works">Work</a></li>
         <li><a href="#profile">About</a></li>
       </ul>
     </nav>
