@@ -10,6 +10,8 @@ collections:
     folder: "_projects"
     create: true
     slug: "{{slug}}"
+    format: "json"
+    extension: "json"
     fields:
       - {label: "Title", name: "title", widget: "string"}
       - label: "Category"
