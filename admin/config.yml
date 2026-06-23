@@ -1,0 +1,24 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "images"
+
+collections:
+  - name: "projects"
+    label: "Projects"
+    folder: "_projects"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        options:
+          - {label: "Compositing", value: "comp"}
+          - {label: "Set Supervisor", value: "sup"}
+          - {label: "Compositing + Set Supervisor", value: "comp sup"}
+      - {label: "YouTube ID", name: "youtube_id", widget: "string", hint: "Only the ID from the URL, e.g. cESpcXd6DGM"}
+      - {label: "Year", name: "year", widget: "string"}
+      - {label: "Client / Type", name: "client_type", widget: "string", hint: "e.g. Feature Film, TV Series, Publicidad"}
