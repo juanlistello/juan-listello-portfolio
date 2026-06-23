@@ -807,6 +807,19 @@ footer{
 </div><!-- /wrap -->
 
 <script>
+/* Netlify Identity — redirect to /admin after login */
+if(window.netlifyIdentity){
+  window.netlifyIdentity.on('init', user => {
+    if(!user){
+      window.netlifyIdentity.on('login', () => {
+        document.location.href = '/admin/';
+      });
+    }
+  });
+}
+</script>
+
+<script>
 /* ─────────────────────────────────────────
    GOOGLE SHEETS CONFIG
    Paste your published CSV URL here
