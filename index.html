@@ -6,18 +6,18 @@
 <meta name="description" content="Juan Listello — VFX Compositor and On-Set Supervisor specializing in film, TV series and advertising.">
 <title>Juan Listello — VFX Compositor</title>
 
-<!-- Social / Open Graph — TODO: confirm the production domain below -->
+<!-- Social / Open Graph — uses the Netlify default domain; update if a custom domain is added -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="Juan Listello — VFX Compositor &amp; On-Set Supervisor">
 <meta property="og:description" content="VFX Compositor and On-Set Supervisor specializing in film, TV series and advertising.">
-<meta property="og:url" content="https://juan-listello-portfolio.netlify.app/">
-<meta property="og:image" content="https://juan-listello-portfolio.netlify.app/images/og-cover.jpg">
+<meta property="og:url" content="https://celadon-dodol-a0a88b.netlify.app/">
+<meta property="og:image" content="https://celadon-dodol-a0a88b.netlify.app/images/og-cover.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Juan Listello — VFX Compositor &amp; On-Set Supervisor">
 <meta name="twitter:description" content="VFX Compositor and On-Set Supervisor specializing in film, TV series and advertising.">
-<meta name="twitter:image" content="https://juan-listello-portfolio.netlify.app/images/og-cover.jpg">
+<meta name="twitter:image" content="https://celadon-dodol-a0a88b.netlify.app/images/og-cover.jpg">
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -240,10 +240,17 @@ footer{padding:1.5rem 3rem;border-top:1px solid rgba(200,120,32,0.06);display:fl
 .sdot{width:5px;height:5px;border-radius:50%!important;background:rgba(106,148,72,0.6);animation:pulse 4s infinite;display:inline-block;margin-right:.5rem;}
 @keyframes pulse{0%,100%{opacity:.7;}50%{opacity:.1;}}
 
-/* ADMIN EASTER EGG — only revealed for a logged-in Netlify Identity user */
-.admin-egg{position:fixed;left:1rem;bottom:1rem;z-index:150;display:none;align-items:center;gap:.6rem;padding:.55rem .9rem;background:rgba(14,16,10,0.92);border:1px solid rgba(106,148,72,0.5);color:var(--bio-p);font-family:'Share Tech Mono',monospace;font-size:.55rem;letter-spacing:3px;text-transform:uppercase;box-shadow:0 0 24px rgba(106,148,72,0.18);backdrop-filter:blur(8px);cursor:pointer;user-select:none;}
-.admin-egg.show{display:flex;animation:eggGlitch .5s steps(2) 1,fadeUp .6s ease;}
+/* ADMIN EASTER EGG — fake "hacking" terminal, only for a logged-in admin */
+.admin-egg{position:fixed;left:1rem;bottom:1rem;z-index:150;display:none;width:min(360px,calc(100vw - 2rem));flex-direction:column;background:rgba(10,12,8,0.96);border:1px solid rgba(106,148,72,0.5);box-shadow:0 0 30px rgba(106,148,72,0.2);backdrop-filter:blur(8px);font-family:'Share Tech Mono',monospace;}
+.admin-egg.show{display:flex;animation:eggGlitch .5s steps(2) 1,fadeUp .5s ease;}
+.admin-egg-bar{display:flex;align-items:center;gap:.5rem;padding:.45rem .7rem;border-bottom:1px solid rgba(106,148,72,0.25);font-size:.5rem;letter-spacing:3px;text-transform:uppercase;color:var(--bio-p);}
 .admin-egg-dot{width:6px;height:6px;border-radius:50%!important;background:var(--bio-p);box-shadow:0 0 8px var(--bio-p);animation:pulse 3s infinite;flex-shrink:0;}
+.admin-egg-x{margin-left:auto;background:none;border:none;color:var(--text-muted);font-family:inherit;font-size:.95rem;line-height:1;cursor:pointer;padding:0 .15rem;}
+.admin-egg-x:hover{color:var(--amber-p);}
+.admin-egg-body{margin:0;padding:.7rem .8rem;font-size:.62rem;line-height:1.75;color:var(--bio-p);white-space:pre-wrap;word-break:break-word;min-height:1.75em;}
+.admin-egg-body .hl{color:var(--amber-p);text-shadow:0 0 8px rgba(200,120,32,0.45);}
+.admin-egg-cursor{display:inline-block;width:7px;height:1em;background:var(--bio-p);vertical-align:text-bottom;animation:eggBlink 1s steps(1) infinite;}
+@keyframes eggBlink{0%,50%{opacity:1;}51%,100%{opacity:0;}}
 @keyframes eggGlitch{0%,100%{}30%{transform:translateX(2px) skewX(-3deg);}65%{transform:translateX(-2px);}}
 
 /* RESPONSIVE */
@@ -518,9 +525,13 @@ footer{padding:1.5rem 3rem;border-top:1px solid rgba(200,120,32,0.06);display:fl
 </div>
 
 <!-- Hidden unless a logged-in admin (Juan) is on the page -->
-<div class="admin-egg" id="adminEgg" role="status" aria-hidden="true" title="Click">
-  <span class="admin-egg-dot" aria-hidden="true"></span>
-  <span id="adminEggText">OPERATOR ONLINE</span>
+<div class="admin-egg" id="adminEgg" role="status" aria-live="polite" aria-hidden="true">
+  <div class="admin-egg-bar">
+    <span class="admin-egg-dot" aria-hidden="true"></span>
+    <span>SECURE SHELL · listello-os</span>
+    <button class="admin-egg-x" id="adminEggClose" type="button" aria-label="Cerrar">&times;</button>
+  </div>
+  <pre class="admin-egg-body" id="adminEggBody"></pre>
 </div>
 
 <script>
@@ -533,22 +544,45 @@ if(window.netlifyIdentity){
   window.netlifyIdentity.on('logout',()=>{const egg=document.getElementById('adminEgg');if(egg){egg.classList.remove('show');egg.setAttribute('aria-hidden','true');}});
 }
 
-/* ── ADMIN EASTER EGG ── shown only when an authenticated user is on the page */
+/* ── ADMIN EASTER EGG ── fake "hacking" terminal, only for an authenticated admin */
 function revealAdminEgg(user){
   const egg=document.getElementById('adminEgg');
-  if(!egg)return;
-  const txt=document.getElementById('adminEggText');
+  if(!egg||egg.classList.contains('show'))return;
+  const body=document.getElementById('adminEggBody');
   const full=(user&&user.user_metadata&&user.user_metadata.full_name)?user.user_metadata.full_name:'Juan';
-  const first=full.split(' ')[0];
-  const primary='OPERATOR '+first.toUpperCase()+' · CLEARANCE Ω';
-  const secret='THE SET IS YOURS, '+first.toUpperCase()+' — ROLL CAMERA';
-  txt.textContent=primary;
+  const first=full.split(' ')[0].toUpperCase();
+  const lines=[
+    'root@listello:~$ ./run.sh',
+    'bypassing firewall ........... OK',
+    'mounting render farm ......... OK',
+    'decrypting showreel .......... OK',
+    first+', TE ESTOY HACKEANDO 😈',
+    '...mentira, soy yo. abrazo, Mati.'
+  ];
   egg.classList.add('show');
   egg.setAttribute('aria-hidden','false');
-  egg.setAttribute('aria-label','Admin status: '+primary);
-  console.log('%c◉ Welcome back, '+first+'. The system is yours.','color:#8ab860;font-family:monospace;font-size:14px;');
-  let secretOn=false;
-  egg.addEventListener('click',()=>{secretOn=!secretOn;txt.textContent=secretOn?secret:primary;});
+  egg.setAttribute('aria-label',first+', te estoy hackeando — easter egg de Mati');
+  console.log('%c◉ '+first+', TE ESTOY HACKEANDO 😈 ...mentira, soy yo. — Mati','color:#8ab860;font-family:monospace;font-size:14px;');
+  const close=document.getElementById('adminEggClose');
+  if(close)close.addEventListener('click',()=>{egg.classList.remove('show');egg.setAttribute('aria-hidden','true');});
+  if(prefersReducedMotion){body.textContent=lines.join('\n');return;}
+  body.innerHTML='<span class="admin-egg-cursor" aria-hidden="true"></span>';
+  const cursor=body.querySelector('.admin-egg-cursor');
+  let li=0;
+  function typeLine(){
+    if(li>=lines.length)return;
+    const text=lines[li],punch=li===4;
+    const span=document.createElement('span');
+    if(punch)span.className='hl';
+    body.insertBefore(span,cursor);
+    let ci=0;
+    (function typeChar(){
+      span.textContent=text.slice(0,ci++);
+      if(ci<=text.length){setTimeout(typeChar,28+Math.random()*45);}
+      else{body.insertBefore(document.createTextNode('\n'),cursor);li++;setTimeout(typeLine,li===5?700:240);}
+    })();
+  }
+  setTimeout(typeLine,400);
 }
 
 /* ── LOADER ── */
