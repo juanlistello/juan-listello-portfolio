@@ -240,6 +240,12 @@ footer{padding:1.5rem 3rem;border-top:1px solid rgba(200,120,32,0.06);display:fl
 .sdot{width:5px;height:5px;border-radius:50%!important;background:rgba(106,148,72,0.6);animation:pulse 4s infinite;display:inline-block;margin-right:.5rem;}
 @keyframes pulse{0%,100%{opacity:.7;}50%{opacity:.1;}}
 
+/* ADMIN EASTER EGG — only revealed for a logged-in Netlify Identity user */
+.admin-egg{position:fixed;left:1rem;bottom:1rem;z-index:150;display:none;align-items:center;gap:.6rem;padding:.55rem .9rem;background:rgba(14,16,10,0.92);border:1px solid rgba(106,148,72,0.5);color:var(--bio-p);font-family:'Share Tech Mono',monospace;font-size:.55rem;letter-spacing:3px;text-transform:uppercase;box-shadow:0 0 24px rgba(106,148,72,0.18);backdrop-filter:blur(8px);cursor:pointer;user-select:none;}
+.admin-egg.show{display:flex;animation:eggGlitch .5s steps(2) 1,fadeUp .6s ease;}
+.admin-egg-dot{width:6px;height:6px;border-radius:50%!important;background:var(--bio-p);box-shadow:0 0 8px var(--bio-p);animation:pulse 3s infinite;flex-shrink:0;}
+@keyframes eggGlitch{0%,100%{}30%{transform:translateX(2px) skewX(-3deg);}65%{transform:translateX(-2px);}}
+
 /* RESPONSIVE */
 @media(max-width:900px){
   .profile-grid{grid-template-columns:1fr;}
@@ -511,12 +517,38 @@ footer{padding:1.5rem 3rem;border-top:1px solid rgba(200,120,32,0.06);display:fl
   </footer>
 </div>
 
+<!-- Hidden unless a logged-in admin (Juan) is on the page -->
+<div class="admin-egg" id="adminEgg" role="status" aria-hidden="true" title="Click">
+  <span class="admin-egg-dot" aria-hidden="true"></span>
+  <span id="adminEggText">OPERATOR ONLINE</span>
+</div>
+
 <script>
 /* ── NETLIFY IDENTITY ── */
 if(window.netlifyIdentity){
   window.netlifyIdentity.on('init',user=>{
     if(!user){window.netlifyIdentity.on('login',()=>{document.location.href='/admin/';});}
+    else{revealAdminEgg(user);}
   });
+  window.netlifyIdentity.on('logout',()=>{const egg=document.getElementById('adminEgg');if(egg){egg.classList.remove('show');egg.setAttribute('aria-hidden','true');}});
+}
+
+/* ── ADMIN EASTER EGG ── shown only when an authenticated user is on the page */
+function revealAdminEgg(user){
+  const egg=document.getElementById('adminEgg');
+  if(!egg)return;
+  const txt=document.getElementById('adminEggText');
+  const full=(user&&user.user_metadata&&user.user_metadata.full_name)?user.user_metadata.full_name:'Juan';
+  const first=full.split(' ')[0];
+  const primary='OPERATOR '+first.toUpperCase()+' · CLEARANCE Ω';
+  const secret='THE SET IS YOURS, '+first.toUpperCase()+' — ROLL CAMERA';
+  txt.textContent=primary;
+  egg.classList.add('show');
+  egg.setAttribute('aria-hidden','false');
+  egg.setAttribute('aria-label','Admin status: '+primary);
+  console.log('%c◉ Welcome back, '+first+'. The system is yours.','color:#8ab860;font-family:monospace;font-size:14px;');
+  let secretOn=false;
+  egg.addEventListener('click',()=>{secretOn=!secretOn;txt.textContent=secretOn?secret:primary;});
 }
 
 /* ── LOADER ── */
