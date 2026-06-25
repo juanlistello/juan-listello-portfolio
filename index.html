@@ -5,6 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Juan Listello — VFX Compositor and On-Set Supervisor specializing in film, TV series and advertising.">
 <title>Juan Listello — VFX Compositor</title>
+
+<!-- Social / Open Graph — uses the Netlify default domain; update if a custom domain is added -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Juan Listello — VFX Compositor &amp; On-Set Supervisor">
+<meta property="og:description" content="VFX Compositor and On-Set Supervisor specializing in film, TV series and advertising.">
+<meta property="og:url" content="https://celadon-dodol-a0a88b.netlify.app/">
+<meta property="og:image" content="https://celadon-dodol-a0a88b.netlify.app/images/og-cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Juan Listello — VFX Compositor &amp; On-Set Supervisor">
+<meta name="twitter:description" content="VFX Compositor and On-Set Supervisor specializing in film, TV series and advertising.">
+<meta name="twitter:image" content="https://celadon-dodol-a0a88b.netlify.app/images/og-cover.jpg">
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -18,7 +31,7 @@ ul,ol,li{list-style:none;}
   --cream:#c0aa80;--cream-d:#8a7a60;--cream-m:#4a4030;
   --text-primary:#e0d0a8;
   --text-secondary:#b8a07a;
-  --text-muted:#806848;
+  --text-muted:#99805a;
   --focus:#8ab860;
 }
 html{scroll-behavior:smooth;}
@@ -263,6 +276,12 @@ footer{padding:1.5rem 3rem;border-top:1px solid rgba(200,120,32,0.06);display:fl
   .nav-links a{text-decoration:underline;}
 }
 </style>
+<noscript><style>
+/* Without JS the reveal animations never trigger — force content visible */
+.reveal,.reveal-left,.reveal-right{opacity:1!important;transform:none!important;}
+#loader{display:none!important;}
+#works-loading{display:none!important;}
+</style></noscript>
 </head>
 <body>
 
@@ -516,6 +535,7 @@ function tickLoader(){
 setTimeout(tickLoader,300);
 
 /* ── RAIN ── */
+const prefersReducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const rc=document.getElementById('rainCanvas'),rx=rc.getContext('2d');
 function resize(){rc.width=window.innerWidth;rc.height=window.innerHeight;}
 resize();window.addEventListener('resize',resize);
@@ -528,7 +548,7 @@ function drawRain(){
   nearDrops.forEach(d=>{rx.beginPath();rx.moveTo(d.x,d.y);rx.lineTo(d.x+d.dx*d.l*.08,d.y+d.l);rx.strokeStyle=`rgba(200,170,110,${d.o})`;rx.lineWidth=d.w;rx.stroke();d.y+=d.s;d.x+=d.dx*.08;if(d.y>rc.height+20){d.y=-20;d.x=Math.random()*rc.width;}if(d.x<-10)d.x=rc.width+10;if(d.x>rc.width+10)d.x=-10;});
   requestAnimationFrame(drawRain);
 }
-drawRain();
+if(!prefersReducedMotion)drawRain();
 
 /* ── CURSOR ── */
 window.addEventListener('mousemove',e=>{const g=document.getElementById('cursorGlow');g.style.left=e.clientX+'px';g.style.top=e.clientY+'px';});
@@ -558,7 +578,7 @@ function buildCard(p,i){
   li.dataset.tags=tags;
   li.style.transitionDelay=(i*.06).toFixed(2)+'s';
   li.innerHTML=`
-    <button style="all:unset;display:contents;cursor:pointer;" data-yt="${p.youtube_id}" data-title="${p.title}"
+    <button type="button" style="display:block;width:100%;text-align:left;background:none;border:none;padding:0;margin:0;color:inherit;font:inherit;cursor:pointer;" data-yt="${p.youtube_id}" data-title="${p.title}"
       aria-label="Watch ${p.title} — ${tagStr}, ${p.year}">
       <div class="wglow" style="background:linear-gradient(to right,transparent,${accent},transparent)" aria-hidden="true"></div>
       <div class="wthumb" aria-hidden="true">
@@ -606,7 +626,7 @@ async function loadProjects(){
     const jsonFiles=files.filter(f=>f.name.endsWith('.json'));
     if(jsonFiles.length===0)throw new Error('no json files');
     const projects=await Promise.all(jsonFiles.map(f=>fetch(f.download_url).then(r=>r.json())));
-    allProjects=projects.sort((a,b)=>(b.year||0)-(a.year||0));
+    allProjects=projects.sort((a,b)=>(+b.year||0)-(+a.year||0));
     loading.style.display='none';
     renderProjects(allProjects);
   }catch(e){
@@ -658,11 +678,22 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
 function handleSubmit(e){
   e.preventDefault();
   const status=document.getElementById('form-status');
-  const name=document.getElementById('f-name').value.trim();
-  const email=document.getElementById('f-email').value.trim();
-  const msg=document.getElementById('f-msg').value.trim();
-  if(!name||!email||!msg){status.style.color='var(--amber-p)';status.textContent='Please fill in all required fields.';return;}
-  status.style.color='var(--bio-p)';status.textContent='Message sent — thank you!';e.target.reset();
+  const fields=[document.getElementById('f-name'),document.getElementById('f-email'),document.getElementById('f-msg')];
+  let firstInvalid=null;
+  fields.forEach(f=>{
+    const invalid=!f.value.trim();
+    f.setAttribute('aria-invalid',invalid?'true':'false');
+    if(invalid&&!firstInvalid)firstInvalid=f;
+  });
+  if(firstInvalid){
+    status.style.color='var(--amber-p)';
+    status.textContent='Please fill in all required fields.';
+    firstInvalid.focus();
+    return;
+  }
+  status.style.color='var(--bio-p)';status.textContent='Message sent — thank you!';
+  fields.forEach(f=>f.setAttribute('aria-invalid','false'));
+  e.target.reset();
 }
 </script>
 </body>

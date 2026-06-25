@@ -1,0 +1,25 @@
+name: Validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Highest-value check: a malformed project JSON from the CMS would break
+      # the whole gallery in production. This blocks the merge.
+      - name: Validate project JSON
+        run: node scripts/validate-projects.mjs
+
+      # Catch broken markup (unclosed tags, duplicate ids, missing doctype/title).
+      - name: Lint HTML
+        run: npx --yes htmlhint@1 index.html admin/index.html
