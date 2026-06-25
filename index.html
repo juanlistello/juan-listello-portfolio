@@ -240,7 +240,13 @@ footer{padding:1.5rem 3rem;border-top:1px solid rgba(200,120,32,0.06);display:fl
 .sdot{width:5px;height:5px;border-radius:50%!important;background:rgba(106,148,72,0.6);animation:pulse 4s infinite;display:inline-block;margin-right:.5rem;}
 @keyframes pulse{0%,100%{opacity:.7;}50%{opacity:.1;}}
 
-/* ADMIN EASTER EGG — fake "hacking" terminal, only for a logged-in admin */
+/* ===== EASTER-EGG START (1/4: CSS) — admin "hacking" terminal prank =====
+   To remove the easter egg completely, delete the 4 blocks tagged EASTER-EGG:
+     1/4 this CSS block (down to EASTER-EGG END below)
+     2/4 the <div id="adminEgg"> element near the footer
+     3/4 the revealAdminEgg() function in the <script>
+     4/4 the two hook lines inside the NETLIFY IDENTITY block (revealAdminEgg + logout)
+   ======================================================================= */
 .admin-egg{position:fixed;left:50%;bottom:2rem;transform:translateX(-50%);z-index:150;display:none;width:min(620px,calc(100vw - 2rem));flex-direction:column;background:rgba(10,12,8,0.97);border:1px solid rgba(106,148,72,0.6);box-shadow:0 0 60px rgba(106,148,72,0.35),inset 0 0 30px rgba(0,0,0,0.5);backdrop-filter:blur(10px);font-family:'Share Tech Mono',monospace;}
 .admin-egg.show{display:flex;animation:eggIn .5s ease;}
 @keyframes eggIn{from{opacity:0;transform:translateX(-50%) translateY(16px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
@@ -250,8 +256,10 @@ footer{padding:1.5rem 3rem;border-top:1px solid rgba(200,120,32,0.06);display:fl
 .admin-egg-x:hover{color:var(--amber-p);}
 .admin-egg-body{margin:0;padding:1.2rem 1.3rem;font-size:.95rem;line-height:1.85;color:var(--bio-p);white-space:pre-wrap;word-break:break-word;min-height:1.85em;}
 .admin-egg-body .hl{color:var(--amber-p);font-size:1.25rem;text-shadow:0 0 14px rgba(200,120,32,0.6);}
+.admin-egg-body .dim{color:var(--text-muted);font-size:.72rem;}
 .admin-egg-cursor{display:inline-block;width:9px;height:1em;background:var(--bio-p);vertical-align:text-bottom;animation:eggBlink 1s steps(1) infinite;}
 @keyframes eggBlink{0%,50%{opacity:1;}51%,100%{opacity:0;}}
+/* ===== EASTER-EGG END (1/4: CSS) ===== */
 
 /* RESPONSIVE */
 @media(max-width:900px){
@@ -524,7 +532,7 @@ footer{padding:1.5rem 3rem;border-top:1px solid rgba(200,120,32,0.06);display:fl
   </footer>
 </div>
 
-<!-- Hidden unless a logged-in admin (Juan) is on the page -->
+<!-- ===== EASTER-EGG START (2/4: HTML) — delete this whole block to remove ===== -->
 <div class="admin-egg" id="adminEgg" role="status" aria-live="polite" aria-hidden="true">
   <div class="admin-egg-bar">
     <span class="admin-egg-dot" aria-hidden="true"></span>
@@ -533,18 +541,20 @@ footer{padding:1.5rem 3rem;border-top:1px solid rgba(200,120,32,0.06);display:fl
   </div>
   <pre class="admin-egg-body" id="adminEggBody"></pre>
 </div>
+<!-- ===== EASTER-EGG END (2/4: HTML) ===== -->
 
 <script>
 /* ── NETLIFY IDENTITY ── */
 if(window.netlifyIdentity){
   window.netlifyIdentity.on('init',user=>{
     if(!user){window.netlifyIdentity.on('login',()=>{document.location.href='/admin/';});}
-    else{revealAdminEgg(user);}
+    else{revealAdminEgg(user);} /* EASTER-EGG (4/4: JS hook) — delete this else branch to remove */
   });
+  /* EASTER-EGG (4/4: JS hook) — delete the next line to remove */
   window.netlifyIdentity.on('logout',()=>{const egg=document.getElementById('adminEgg');if(egg){egg.classList.remove('show');egg.setAttribute('aria-hidden','true');}});
 }
 
-/* ── ADMIN EASTER EGG ── fake "hacking" terminal, only for an authenticated admin */
+/* ===== EASTER-EGG START (3/4: JS) — delete this whole function to remove ===== */
 function revealAdminEgg(user){
   const egg=document.getElementById('adminEgg');
   if(!egg||egg.classList.contains('show'))return;
@@ -557,12 +567,13 @@ function revealAdminEgg(user){
     'mounting render farm ......... OK',
     'decrypting showreel .......... OK',
     first+', TE ESTOY HACKEANDO 😈',
-    '...mentira, soy yo. abrazo, Mati.'
+    first+' OTARIO, SOY YO MATIAS — NO TE CAGUES.',
+    'rm: para quitarme, borrá los bloques marcados EASTER-EGG en index.html'
   ];
   egg.classList.add('show');
   egg.setAttribute('aria-hidden','false');
-  egg.setAttribute('aria-label',first+', te estoy hackeando — easter egg de Mati');
-  console.log('%c◉ '+first+', TE ESTOY HACKEANDO 😈 ...mentira, soy yo. — Mati','color:#8ab860;font-family:monospace;font-size:14px;');
+  egg.setAttribute('aria-label',first+', te estoy hackeando — easter egg de Matias');
+  console.log('%c◉ '+first+', TE ESTOY HACKEANDO 😈 — '+first+' OTARIO, SOY YO MATIAS, NO TE CAGUES.','color:#8ab860;font-family:monospace;font-size:14px;');
   const close=document.getElementById('adminEggClose');
   if(close)close.addEventListener('click',()=>{egg.classList.remove('show');egg.setAttribute('aria-hidden','true');});
   if(prefersReducedMotion){body.textContent=lines.join('\n');return;}
@@ -571,9 +582,10 @@ function revealAdminEgg(user){
   let li=0;
   function typeLine(){
     if(li>=lines.length)return;
-    const text=lines[li],punch=li===4;
+    const text=lines[li],punch=li===4,note=li===6;
     const span=document.createElement('span');
     if(punch)span.className='hl';
+    else if(note)span.className='dim';
     body.insertBefore(span,cursor);
     let ci=0;
     (function typeChar(){
@@ -584,6 +596,7 @@ function revealAdminEgg(user){
   }
   setTimeout(typeLine,400);
 }
+/* ===== EASTER-EGG END (3/4: JS) ===== */
 
 /* ── LOADER ── */
 const stages=['Initializing render pipeline...','Caching VFX assets...','Buffering frames...','Rendering holographic layer...','Compiling composite nodes...','System ready.'];
